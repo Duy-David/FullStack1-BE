@@ -113,7 +113,6 @@ export class UsersService {
       codeId: codeId,
       // codeExpired: dayjs().add(30, 'seconds'),
       codeExpired: dayjs().add(5, 'minutes'),
-
     });
     // send email
     this.mailerService.sendMail({
@@ -144,10 +143,40 @@ export class UsersService {
     const isBeforeCheck = dayjs().isBefore(user.codeExpired);
     if (isBeforeCheck) {
       // valid
-      await this.userModel.updateOne({_id:data._id},{isActive:true})
-      return { isBeforeCheck }
+      await this.userModel.updateOne({ _id: data._id }, { isActive: true });
+      return { isBeforeCheck };
     } else {
       throw new BadRequestException('Mã code không hợp lệ hoặc hết hạn');
     }
+  }
+  async retryActive(email: string) {
+   
+    const user = await this.userModel.findOne({ email });
+    if (!user) {
+      throw new BadRequestException('Tài khoản không tồn tại');
+    }
+    if (user.isActive) {
+      throw new BadRequestException('Tài khoản đã được kích hoạt');
+    }
+    const codeId = uuidv4();
+    // update user
+    await user.updateOne({
+      codeId: codeId,
+      // codeExpired: dayjs().add(30, 'seconds'),
+      codeExpired: dayjs().add(5, 'minutes'),
+    })
+    // send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Activate your account at @phuongDuy', // Subject line
+      // text: 'welcome', // plaintext body
+      // html: '<b>hello phuong Duy</b>', // HTML body content
+      template: 'register',
+      context: {
+        name: user?.name ?? user.email,
+        activationCode: codeId,
+      },
+    });
+    return { _id: user._id };
   }
 }

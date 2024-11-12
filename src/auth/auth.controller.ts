@@ -26,7 +26,7 @@ export class AuthController {
   @Post('login')
   @Public()
   @UseGuards(LocalAuthGuard)
-  @ResponseMessage("Fetch login")
+  @ResponseMessage('Fetch login')
   handleLogin(@Request() req) {
     return this.authService.login(req.user);
   }
@@ -43,26 +43,29 @@ export class AuthController {
   }
   @Post('check-code')
   @Public()
-  checkCodde(@Body() registerDto: CodeAuthDto) {
+  checkCode(@Body() registerDto: CodeAuthDto) {
     return this.authService.checkCode(registerDto);
   }
-
+  @Post('retry-active')
+  @Public()
+  retryActive(@Body('email') email: string) {
+    return this.authService.retryActive(email);
+  }
 
   @Get('mail')
   @Public()
   testMail() {
-    this.mailerService
-      .sendMail({
-        to: 'duydavid2506@gmail.com ', // list of receivers
-        subject: 'Testing Nest MailerModule ✔', // Subject line
-        text: 'welcome', // plaintext body
-        // html: '<b>hello phuong Duy</b>', // HTML body content
-        template: "register",
-        context:{
-          name:"Duy",
-          activationCode: 123456789
-        }
-      })
+    this.mailerService.sendMail({
+      to: 'duydavid2506@gmail.com ', // list of receivers
+      subject: 'Testing Nest MailerModule ✔', // Subject line
+      text: 'welcome', // plaintext body
+      // html: '<b>hello phuong Duy</b>', // HTML body content
+      template: 'register',
+      context: {
+        name: 'Duy',
+        activationCode: 123456789,
+      },
+    });
     return 'ok';
   }
 }

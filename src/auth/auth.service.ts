@@ -41,6 +41,9 @@ export class AuthService {
   checkCode = async (data: CodeAuthDto) => {
     return await this.usersService.handleActive(data);
   };
+  retryActive = async (data: string) => {
+    return await this.usersService.retryActive(data);
+  };
   // async signIn(username: string, pass: string): Promise<any> {
   //   const user = await this.usersService.findByEmail(username);
   //   const isValidPassword = await comparePasswordHelper(pass, user.password);
